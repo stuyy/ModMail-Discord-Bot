@@ -29,12 +29,34 @@ client.on('message', async (message) => {
         let guild = memberGuilds.find(g => g.name.toLowerCase() === collected.first().content);
         openedTickets.set(message.author.id, guild);
         message.channel.send("Your message has been received, we will be with you shortly.");
-        client.emit('modMessage', collected.first(), user, guild);
+        client.emit('modMessage', message, user, guild);
     }
 });
 
-client.on('modMessage', (msg, user, guild) => {
-    console.log(msg.content);
-    console.log(user.username);
-    console.log(guild.name)
+client.on('modMessage', async (message, user, guild) => {
+    // Find channel for guild...
+    let channel = guild.channels.find(c => c.name === 'mod-mail');
+    let embed = new discord.MessageEmbed();
+    embed.setTitle("New Message from: " + user.tag);
+    embed.addField("Guild", `${guild.name}`);
+    embed.setDescription(`Message: ${message.content}`);
+    let msg = await channel.send(embed);
+
+    await msg.react('✅');
+    await msg.react('❎');
+    
+    let reactionFilter = (reaction, user) => (reaction.emoji.name === '✅' || reaction.emoji.name === '❎') && !user.bot;
+
+    let collector = new discord.ReactionCollector(msg, reactionFilter, { max: 1 });
+    collector.on('end', collected => {
+        console.log(collected);
+        if(collected.first().emoji.name === '✅') {
+            console.log("Accepted.");
+        
+        } 
+        else if(collected.first().emoji.name === '❎') {
+            user.send("Request denied.")
+            openedTickets.delete(user.id);
+        }
+    });
 });
