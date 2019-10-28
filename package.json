@@ -1,0 +1,29 @@
+{
+  "name": "modmail-discord-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/bot.js",
+    "dev": "nodemon ./src/bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ansonfoong/ModMail-Discord-Bot.git"
+  },
+  "keywords": [],
+  "author": "Anson Foong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ansonfoong/ModMail-Discord-Bot/issues"
+  },
+  "homepage": "https://github.com/ansonfoong/ModMail-Discord-Bot#readme",
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  },
+  "dependencies": {
+    "discord.js": "github:discordjs/discord.js#master",
+    "dotenv": "^8.2.0"
+  }
+}
