@@ -20,7 +20,7 @@ client.on('message', async (message) => {
         });
         let embed = new discord.MessageEmbed();
         embed.setTitle(`Please choose which server`);
-        let desc = '';
+        let desc = ''; 
         memberGuilds.forEach(guild => desc += guild.name + '\n');
         embed.setDescription(`${desc}`);
         let msg = await message.channel.send(embed);
@@ -48,11 +48,37 @@ client.on('modMessage', async (message, user, guild) => {
     let reactionFilter = (reaction, user) => (reaction.emoji.name === '✅' || reaction.emoji.name === '❎') && !user.bot;
 
     let collector = new discord.ReactionCollector(msg, reactionFilter, { max: 1 });
-    collector.on('end', collected => {
+    collector.on('end', async collected => {
         console.log(collected);
         if(collected.first().emoji.name === '✅') {
-            console.log("Accepted.");
-        
+            console.log(guild.id);
+            let newChannel = await guild.channels.create(`${user.id}-channel`, {
+                type: 'text',
+                permissionOverwrites: [
+                    {
+                        id: guild.id,
+                        deny: ['VIEW_CHANNEL']
+                    },
+                    {
+                        id: '533096507667382289',
+                        allow: ['VIEW_CHANNEL']
+                    }
+                ]
+            }).catch(err => console.log(err));
+            newChannel.send("Case created for " + user.tag);
+            let msgFilter = (m) => !m.author.bot;
+            let messageCollector = newChannel.createMessageCollector(msgFilter);
+            messageCollector.on('collect', m => {
+                user.send(m);
+            });
+            messageCollector.on('end', collected => { 
+                console.log('done')
+            });
+            let DMChannelCollector = user.dmChannel.createMessageCollector(msgFilter);
+            DMChannelCollector.on('collect', m => {
+                newChannel.send(m);
+            });
+            DMChannelCollector.on('end', c => console.log('done'));
         } 
         else if(collected.first().emoji.name === '❎') {
             user.send("Request denied.")
