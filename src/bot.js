@@ -26,8 +26,15 @@ client.on('message', async (message) => {
         let msg = await message.channel.send(embed);
         let msgFilter = m => m.author.id === message.author.id;
         let collected = await msg.channel.awaitMessages(msgFilter, { max: 1 });
-        openedTickets.set(message.author.id, memberGuilds.find(g => g.name.toLowerCase() === collected.first().content));
+        let guild = memberGuilds.find(g => g.name.toLowerCase() === collected.first().content);
+        openedTickets.set(message.author.id, guild);
         message.channel.send("Your message has been received, we will be with you shortly.");
-        console.log(openedTickets);
+        client.emit('modMessage', collected.first(), user, guild);
     }
+});
+
+client.on('modMessage', (msg, user, guild) => {
+    console.log(msg.content);
+    console.log(user.username);
+    console.log(guild.name)
 });
